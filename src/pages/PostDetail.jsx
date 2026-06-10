@@ -105,6 +105,7 @@ export default function PostDetail() {
       if (goToApp) {
         // Same origin (ustarman.github.io) → localStorage is shared between both apps
         localStorage.setItem('dutySwapPrefill', JSON.stringify({
+          _ts: Date.now(),
           weekCommencing: post.week_commencing,
           weekType: post.week_type,
           driverAName: post.profiles?.full_name || '',
