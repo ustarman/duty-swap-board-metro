@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Header from '../components/Header'
 import SectionDivider from '../components/SectionDivider'
+import Dialog from '../components/Dialog'
 import { useAuth } from '../context/AuthContext'
+import { useDialog } from '../hooks/useDialog'
 import { fetchPost, applyToPost, acceptApplicant, closePost } from '../dataService'
 import { AP_RED, CARD, BTN_PRIMARY, FIELD_LABEL } from '../theme'
 
@@ -29,6 +31,7 @@ export default function PostDetail() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { user } = useAuth()
+  const { dialog, showConfirm, showAlert, handleConfirm, handleCancel } = useDialog()
 
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -55,16 +58,17 @@ export default function PostDetail() {
   const myApplication = post?.applicants?.find(a => a.applicant_id === user?.id)
 
   const handleApply = async () => {
-    if (!confirm('Apply for this swap request?')) return
+    const ok = await showConfirm('Apply for this swap request?', { confirmLabel: 'Apply' })
+    if (!ok) return
     setApplying(true)
     try {
       await applyToPost(post.id, user.id)
       await loadPost()
     } catch (err) {
       if (err.message?.includes('duplicate key') || err.message?.includes('unique constraint')) {
-        alert('You have already applied for this swap.')
+        await showAlert('You have already applied for this swap.')
       } else {
-        alert(err.message || 'Failed to apply.')
+        await showAlert(err.message || 'Failed to apply.')
       }
     } finally {
       setApplying(false)
@@ -72,22 +76,29 @@ export default function PostDetail() {
   }
 
   const handleClose = async () => {
-    if (!confirm('Close this post? It will no longer accept applicants.')) return
+    const ok = await showConfirm('Close this post? It will no longer accept applicants.', {
+      confirmLabel: 'Close Post',
+    })
+    if (!ok) return
     try {
       await closePost(post.id)
       await loadPost()
     } catch (err) {
-      alert(err.message || 'Failed to close post.')
+      await showAlert(err.message || 'Failed to close post.')
     }
   }
 
   const handleAccept = async (applicant) => {
-    if (!confirm(`Accept ${applicant.profiles?.full_name} and proceed with the Duty Swap?`)) return
+    const ok = await showConfirm(
+      `Accept ${applicant.profiles?.full_name} and proceed with the Duty Swap?`,
+      { confirmLabel: 'Accept' }
+    )
+    if (!ok) return
     try {
       await acceptApplicant(applicant.id, post.id)
       await loadPost()
     } catch (err) {
-      alert(err.message || 'Failed to accept.')
+      await showAlert(err.message || 'Failed to accept.')
     }
   }
 
@@ -112,6 +123,8 @@ export default function PostDetail() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100svh', background: 'var(--app-bg)' }}>
       <Header />
+
+      <Dialog dialog={dialog} onConfirm={handleConfirm} onCancel={handleCancel} />
 
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
@@ -242,15 +255,10 @@ export default function PostDetail() {
             <button
               onClick={handleClose}
               style={{
-                width: '100%',
-                padding: '13px',
-                borderRadius: 10,
+                width: '100%', padding: '13px', borderRadius: 10,
                 border: `1.5px solid ${AP_RED}`,
-                background: 'var(--card-bg)',
-                color: AP_RED,
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: 'pointer',
+                background: 'var(--card-bg)', color: AP_RED,
+                fontSize: 14, fontWeight: 600, cursor: 'pointer',
               }}
             >
               Close This Post
