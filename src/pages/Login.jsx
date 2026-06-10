@@ -138,7 +138,7 @@ export default function Login() {
                 type="email"
                 value={form.email}
                 onChange={set('email')}
-                placeholder="e.g. Michael.Colliar@example.com"
+                placeholder="e.g. michael.colliar@example.com"
                 style={INPUT_STYLE}
                 autoCapitalize="none"
               />
