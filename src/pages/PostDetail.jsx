@@ -90,13 +90,28 @@ export default function PostDetail() {
 
   const handleAccept = async (applicant) => {
     const ok = await showConfirm(
-      `Accept ${applicant.profiles?.full_name} and proceed with the Duty Swap?`,
+      `Accept ${applicant.profiles?.full_name} and close this post?`,
       { confirmLabel: 'Accept' }
     )
     if (!ok) return
     try {
       await acceptApplicant(applicant.id, post.id)
       await loadPost()
+      // Ask to open Duty Swap App
+      const goToApp = await showConfirm(
+        'Accepted! Would you like to open the Duty Swap form now?',
+        { confirmLabel: 'Open Form', title: '✅ Accepted!' }
+      )
+      if (goToApp) {
+        const params = new URLSearchParams({
+          weekCommencing: post.week_commencing,
+          weekType: post.week_type,
+          driverAName: post.profiles?.full_name || '',
+          driverADuty: post.duty_number || '',
+          driverBName: applicant.profiles?.full_name || '',
+        })
+        window.open(`https://ustarman.github.io/duty-swap-app/?${params.toString()}`, '_blank')
+      }
     } catch (err) {
       await showAlert(err.message || 'Failed to accept.')
     }
