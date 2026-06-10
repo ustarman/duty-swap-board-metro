@@ -110,7 +110,7 @@ export default function PostDetail() {
           driverADuty: post.duty_number || '',
           driverBName: applicant.profiles?.full_name || '',
         })
-        window.open(`https://ustarman.github.io/duty-swap-app/?${params.toString()}`, '_blank')
+        window.open(`https://ustarman.github.io/duty-swap-app/screen1?${params.toString()}`, '_blank')
       }
     } catch (err) {
       await showAlert(err.message || 'Failed to accept.')
