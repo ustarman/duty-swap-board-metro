@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { AP_RED } from '../theme'
 
 export default function Header({ badge = 'Board' }) {
-  const { signOut } = useAuth()
+  const { user, signOut } = useAuth()
   const navigate = useNavigate()
 
   const handleSignOut = async () => {
@@ -56,22 +56,24 @@ export default function Header({ badge = 'Board' }) {
           {badge}
         </span>
       )}
-      <button
-        onClick={handleSignOut}
-        style={{
-          background: 'rgba(255,255,255,0.15)',
-          border: '1px solid rgba(255,255,255,0.5)',
-          borderRadius: 6,
-          color: 'white',
-          fontSize: 11,
-          fontWeight: 600,
-          padding: '4px 10px',
-          cursor: 'pointer',
-          flexShrink: 0,
-        }}
-      >
-        Sign Out
-      </button>
+      {user && (
+        <button
+          onClick={handleSignOut}
+          style={{
+            background: 'rgba(255,255,255,0.15)',
+            border: '1px solid rgba(255,255,255,0.5)',
+            borderRadius: 6,
+            color: 'white',
+            fontSize: 11,
+            fontWeight: 600,
+            padding: '4px 10px',
+            cursor: 'pointer',
+            flexShrink: 0,
+          }}
+        >
+          Sign Out
+        </button>
+      )}
     </header>
   )
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import Header from '../components/Header'
 import InputBox from '../components/InputBox'
 import { AP_RED, CARD, BTN_PRIMARY, INPUT_STYLE, INPUT_LABEL, FIELD_LABEL } from '../theme'
 
@@ -59,25 +60,7 @@ export default function Login() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100svh', background: 'var(--app-bg)' }}>
 
-      {/* Header */}
-      <div style={{
-        background: AP_RED,
-        padding: '2rem 1.25rem 1.5rem',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 8,
-      }}>
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
-          stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M7 16V4m0 0L3 8m4-4l4 4" />
-          <path d="M17 8v12m0 0l4-4m-4 4l-4-4" />
-        </svg>
-        <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'white', margin: 0 }}>Duty Swap Board</h1>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>Brisbane Transport</p>
-        </div>
-      </div>
+      <Header />
 
       {/* Mode toggle */}
       <div style={{
