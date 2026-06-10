@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import BoardList from './pages/BoardList'
@@ -5,6 +6,7 @@ import PostNew from './pages/PostNew'
 import PostDetail from './pages/PostDetail'
 import Notifications from './pages/Notifications'
 import Login from './pages/Login'
+import { registerPushNotifications } from './hooks/usePushNotifications'
 import './index.css'
 
 function ProtectedRoute({ children }) {
@@ -19,6 +21,11 @@ function ProtectedRoute({ children }) {
 
 function AppRoutes() {
   const { user, loading } = useAuth()
+
+  useEffect(() => {
+    if (user) registerPushNotifications(user.id)
+  }, [user])
+
   if (loading) return null
 
   return (

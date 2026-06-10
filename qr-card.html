@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Duty Swap Board – QR Card</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .card {
+      background: white;
+      border-radius: 24px;
+      width: 340px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+
+    .card-header {
+      background: #C8102E;
+      padding: 28px 24px 24px;
+      text-align: center;
+    }
+
+    .card-header h1 {
+      color: white;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+
+    .card-header .sub {
+      color: rgba(255,255,255,0.85);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+    }
+
+    .card-body {
+      padding: 28px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    #qrcode {
+      display: flex;
+      justify-content: center;
+    }
+
+    #qrcode canvas, #qrcode img {
+      border-radius: 8px;
+    }
+
+    .scan-label {
+      text-align: center;
+    }
+
+    .scan-label .title {
+      color: #C8102E;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .scan-label .url {
+      color: #888;
+      font-size: 11px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 16px;
+      width: 100%;
+      padding: 0 4px;
+    }
+
+    .features li {
+      list-style: none;
+      font-size: 12px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .features li::before {
+      content: '•';
+      color: #C8102E;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .card-footer {
+      border-top: 1px solid #eee;
+      padding: 12px 24px;
+      text-align: center;
+      color: #aaa;
+      font-size: 11px;
+      letter-spacing: 0.3px;
+    }
+
+    @media print {
+      body { background: white; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <h1>Swap Board</h1>
+      <div class="sub">BRISBANE TRANSPORT</div>
+    </div>
+    <div class="card-body">
+      <div id="qrcode"></div>
+      <div class="scan-label">
+        <div class="title">SCAN TO OPEN</div>
+        <div class="url">ustarman.github.io/duty-swap-board-metro</div>
+      </div>
+      <ul class="features">
+        <li>Post Swap Requests</li>
+        <li>Apply &amp; Get Selected</li>
+        <li>Secure Login</li>
+        <li>Real-time Board</li>
+        <li>Cloud Records</li>
+        <li>No Paper Required</li>
+      </ul>
+    </div>
+    <div class="card-footer">Australia Post &nbsp;•&nbsp; Brisbane Transport</div>
+  </div>
+
+  <script>
+    new QRCode(document.getElementById('qrcode'), {
+      text: 'https://ustarman.github.io/duty-swap-board-metro/',
+      width: 220,
+      height: 220,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H,
+    })
+  </script>
+</body>
+</html>
