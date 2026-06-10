@@ -5,7 +5,7 @@ import SectionDivider from '../components/SectionDivider'
 import Dialog from '../components/Dialog'
 import { useAuth } from '../context/AuthContext'
 import { useDialog } from '../hooks/useDialog'
-import { fetchPost, applyToPost, acceptApplicant, closePost } from '../dataService'
+import { fetchPost, applyToPost, acceptApplicant, closePost, withdrawApplication } from '../dataService'
 import { AP_RED, CARD, BTN_PRIMARY, FIELD_LABEL } from '../theme'
 
 const WEEK_TYPE_LABEL = {
@@ -58,11 +58,15 @@ export default function PostDetail() {
   const myApplication = post?.applicants?.find(a => a.applicant_id === user?.id)
 
   const handleApply = async () => {
+    if (hasApplied) {
+      await showAlert('You have already applied for this swap.')
+      return
+    }
     const dutyNumber = await showInput(
-      'Enter your duty number for this week so the poster can consider your swap.',
+      'Enter your duty number so the poster can consider your swap.',
       { confirmLabel: 'Apply', title: 'Apply for This Swap', placeholder: 'e.g. BT135, Spare, RDO' }
     )
-    if (dutyNumber === false) return   // cancelled
+    if (dutyNumber === false) return
     setApplying(true)
     try {
       await applyToPost(post.id, user.id, dutyNumber)
@@ -75,6 +79,17 @@ export default function PostDetail() {
       }
     } finally {
       setApplying(false)
+    }
+  }
+
+  const handleWithdraw = async () => {
+    const ok = await showConfirm('Withdraw your application?', { confirmLabel: 'Withdraw' })
+    if (!ok) return
+    try {
+      await withdrawApplication(myApplication.id)
+      await loadPost()
+    } catch (err) {
+      await showAlert(err.message || 'Failed to withdraw.')
     }
   }
 
@@ -218,6 +233,14 @@ export default function PostDetail() {
               {post.note}
             </div>
           )}
+
+          {/* Applicant count — visible to everyone */}
+          {post.status === 'open' && (
+            <div style={{ marginTop: 12, fontSize: 12, color: 'var(--subtext-color)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span>👥</span>
+              <span>{post.applicantCount ?? 0} {post.applicantCount === 1 ? 'person has' : 'people have'} applied</span>
+            </div>
+          )}
         </div>
 
         {/* Applicants — owner only */}
@@ -310,7 +333,21 @@ export default function PostDetail() {
                 ) : (
                   <>
                     <p style={{ fontSize: 15, fontWeight: 700, color: '#15803D', marginBottom: 4 }}>✓ Application Submitted</p>
-                    <p style={{ fontSize: 12, color: 'var(--subtext-color)' }}>You'll be notified when the poster responds.</p>
+                    {myApplication?.duty_number && (
+                      <p style={{ fontSize: 12, color: 'var(--subtext-color)', marginBottom: 4 }}>Your duty: <strong>{myApplication.duty_number}</strong></p>
+                    )}
+                    <p style={{ fontSize: 12, color: 'var(--subtext-color)', marginBottom: '1rem' }}>You'll be notified when the poster responds.</p>
+                    <button
+                      onClick={handleWithdraw}
+                      style={{
+                        background: 'none', border: '1px solid var(--card-border)',
+                        borderRadius: 8, padding: '8px 16px',
+                        fontSize: 13, color: 'var(--subtext-color)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Withdraw Application
+                    </button>
                   </>
                 )}
               </div>

@@ -19,21 +19,32 @@ export async function fetchPosts(status = null) {
 }
 
 export async function fetchPost(id) {
-  const { data, error } = await supabase
-    .from('posts')
-    .select(`
-      *,
-      profiles:author_id (full_name, employee_id),
-      applicants (
-        id, status, created_at, duty_number,
-        profiles:applicant_id (full_name, employee_id)
-      )
-    `)
-    .eq('id', id)
-    .single()
+  const [{ data, error }, { data: countData }] = await Promise.all([
+    supabase
+      .from('posts')
+      .select(`
+        *,
+        profiles:author_id (full_name, employee_id),
+        applicants (
+          id, applicant_id, status, created_at, duty_number,
+          profiles:applicant_id (full_name, employee_id)
+        )
+      `)
+      .eq('id', id)
+      .single(),
+    supabase.rpc('get_post_applicant_count', { p_post_id: id }),
+  ])
 
   if (error) throw error
-  return data
+  return { ...data, applicantCount: countData ?? 0 }
+}
+
+export async function withdrawApplication(applicationId) {
+  const { error } = await supabase
+    .from('applicants')
+    .delete()
+    .eq('id', applicationId)
+  if (error) throw error
 }
 
 export async function createPost({ dutyNumber, weekCommencing, weekType, note, authorId }) {
