@@ -32,7 +32,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthProvider>
         <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100svh', position: 'relative' }}>
           <AppRoutes />
