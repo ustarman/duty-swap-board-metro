@@ -31,7 +31,7 @@ export default function PostDetail() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { user } = useAuth()
-  const { dialog, showConfirm, showAlert, handleConfirm, handleCancel } = useDialog()
+  const { dialog, inputValue, setInputValue, showConfirm, showAlert, showInput, handleConfirm, handleCancel } = useDialog()
 
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -58,11 +58,14 @@ export default function PostDetail() {
   const myApplication = post?.applicants?.find(a => a.applicant_id === user?.id)
 
   const handleApply = async () => {
-    const ok = await showConfirm('Apply for this swap request?', { confirmLabel: 'Apply' })
-    if (!ok) return
+    const dutyNumber = await showInput(
+      'Enter your duty number for this week so the poster can consider your swap.',
+      { confirmLabel: 'Apply', title: 'Apply for This Swap', placeholder: 'e.g. BT135, Spare, RDO' }
+    )
+    if (dutyNumber === false) return   // cancelled
     setApplying(true)
     try {
-      await applyToPost(post.id, user.id)
+      await applyToPost(post.id, user.id, dutyNumber)
       await loadPost()
     } catch (err) {
       if (err.message?.includes('duplicate key') || err.message?.includes('unique constraint')) {
@@ -109,6 +112,7 @@ export default function PostDetail() {
           driverAName: post.profiles?.full_name || '',
           driverADuty: post.duty_number || '',
           driverBName: applicant.profiles?.full_name || '',
+          driverBDuty: applicant.duty_number || '',
         }
         // URL params: works for both browser tabs and PWA context
         const params = new URLSearchParams(prefill)
@@ -143,7 +147,7 @@ export default function PostDetail() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100svh', background: 'var(--app-bg)' }}>
       <Header />
 
-      <Dialog dialog={dialog} onConfirm={handleConfirm} onCancel={handleCancel} />
+      <Dialog dialog={dialog} inputValue={inputValue} onInputChange={setInputValue} onConfirm={handleConfirm} onCancel={handleCancel} />
 
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
@@ -234,6 +238,9 @@ export default function PostDetail() {
                       <Avatar name={a.profiles?.full_name} />
                       <div>
                         <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-color)' }}>{a.profiles?.full_name}</p>
+                        {a.duty_number && (
+                          <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--ap-red, #E3000B)', marginTop: 1 }}>{a.duty_number}</p>
+                        )}
                         <p style={{ fontSize: 11, color: 'var(--subtext-color)' }}>{a.created_at?.slice(0, 10)}</p>
                       </div>
                     </div>

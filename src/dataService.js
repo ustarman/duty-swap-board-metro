@@ -25,7 +25,7 @@ export async function fetchPost(id) {
       *,
       profiles:author_id (full_name, employee_id),
       applicants (
-        id, status, created_at,
+        id, status, created_at, duty_number,
         profiles:applicant_id (full_name, employee_id)
       )
     `)
@@ -63,10 +63,10 @@ export async function closePost(postId) {
 }
 
 // Applicants
-export async function applyToPost(postId, applicantId) {
+export async function applyToPost(postId, applicantId, dutyNumber = '') {
   const { error } = await supabase
     .from('applicants')
-    .insert({ post_id: postId, applicant_id: applicantId })
+    .insert({ post_id: postId, applicant_id: applicantId, duty_number: dutyNumber || null })
 
   if (error) throw error
 

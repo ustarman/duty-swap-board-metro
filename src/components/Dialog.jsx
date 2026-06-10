@@ -1,6 +1,6 @@
 import { AP_RED } from '../theme'
 
-export default function Dialog({ dialog, onConfirm, onCancel }) {
+export default function Dialog({ dialog, inputValue, onInputChange, onConfirm, onCancel }) {
   if (!dialog) return null
 
   return (
@@ -25,12 +25,38 @@ export default function Dialog({ dialog, onConfirm, onCancel }) {
         )}
         <p style={{
           fontSize: 14, color: 'var(--text-color)',
-          lineHeight: 1.55, marginBottom: '1.5rem', textAlign: 'center',
+          lineHeight: 1.55,
+          marginBottom: dialog.type === 'input' ? '0.75rem' : '1.5rem',
+          textAlign: 'center',
         }}>
           {dialog.message}
         </p>
+
+        {dialog.type === 'input' && (
+          <input
+            type="text"
+            value={inputValue || ''}
+            onChange={e => onInputChange?.(e.target.value)}
+            placeholder={dialog.placeholder || ''}
+            autoFocus
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              borderRadius: 10,
+              border: `1.5px solid ${AP_RED}`,
+              background: 'var(--input-bg)',
+              color: 'var(--text-color)',
+              fontSize: 15,
+              fontWeight: 500,
+              marginBottom: '1.25rem',
+              boxSizing: 'border-box',
+              outline: 'none',
+            }}
+          />
+        )}
+
         <div style={{ display: 'flex', gap: 8 }}>
-          {dialog.type === 'confirm' && (
+          {(dialog.type === 'confirm' || dialog.type === 'input') && (
             <button
               onClick={onCancel}
               style={{
