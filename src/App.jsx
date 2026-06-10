@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import BoardList from './pages/BoardList'
 import PostNew from './pages/PostNew'
 import PostDetail from './pages/PostDetail'
+import Notifications from './pages/Notifications'
 import Login from './pages/Login'
 import './index.css'
 
@@ -26,6 +27,7 @@ function AppRoutes() {
       <Route path="/" element={<ProtectedRoute><BoardList /></ProtectedRoute>} />
       <Route path="/post/new" element={<ProtectedRoute><PostNew /></ProtectedRoute>} />
       <Route path="/post/:id" element={<ProtectedRoute><PostDetail /></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
     </Routes>
   )
 }
