@@ -103,14 +103,15 @@ export default function PostDetail() {
         { confirmLabel: 'Open Form', title: '✅ Accepted!' }
       )
       if (goToApp) {
-        const params = new URLSearchParams({
+        // Same origin (ustarman.github.io) → localStorage is shared between both apps
+        localStorage.setItem('dutySwapPrefill', JSON.stringify({
           weekCommencing: post.week_commencing,
           weekType: post.week_type,
           driverAName: post.profiles?.full_name || '',
           driverADuty: post.duty_number || '',
           driverBName: applicant.profiles?.full_name || '',
-        })
-        window.open(`https://ustarman.github.io/duty-swap-app/screen1?${params.toString()}`, '_blank')
+        }))
+        window.open('https://ustarman.github.io/duty-swap-app/', '_blank')
       }
     } catch (err) {
       await showAlert(err.message || 'Failed to accept.')
