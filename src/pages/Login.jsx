@@ -107,7 +107,7 @@ export default function Login() {
                     type="text"
                     value={form.fullName}
                     onChange={set('fullName')}
-                    placeholder="e.g. John Smith"
+                    placeholder="e.g. Michael Colliar"
                     style={INPUT_STYLE}
                   />
                 </InputBox>
@@ -121,7 +121,7 @@ export default function Login() {
                     type="text"
                     value={form.employeeId}
                     onChange={set('employeeId')}
-                    placeholder="e.g. EMP0042"
+                    placeholder="e.g. 11013XXX"
                     style={INPUT_STYLE}
                   />
                 </InputBox>
@@ -138,7 +138,7 @@ export default function Login() {
                 type="email"
                 value={form.email}
                 onChange={set('email')}
-                placeholder="e.g. john@example.com"
+                placeholder="e.g. Michael.Colliar@example.com"
                 style={INPUT_STYLE}
                 autoCapitalize="none"
               />
