@@ -61,7 +61,11 @@ export default function PostDetail() {
       await applyToPost(post.id, user.id)
       await loadPost()
     } catch (err) {
-      alert(err.message || 'Failed to apply.')
+      if (err.message?.includes('duplicate key') || err.message?.includes('unique constraint')) {
+        alert('You have already applied for this swap.')
+      } else {
+        alert(err.message || 'Failed to apply.')
+      }
     } finally {
       setApplying(false)
     }
