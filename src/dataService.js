@@ -77,12 +77,14 @@ export async function applyToPost(postId, applicantId) {
       supabase.from('profiles').select('full_name').eq('id', applicantId).single(),
     ])
     if (post && applicantProfile) {
-      await supabase.from('notifications').insert({
+      const record = {
         user_id: post.author_id,
         type: 'new_applicant',
         message: `${applicantProfile.full_name} applied for your duty swap (${post.duty_number})`,
         post_id: postId,
-      })
+      }
+      await supabase.from('notifications').insert(record)
+      supabase.functions.invoke('send-push', { body: { record } }).catch(() => {})
     }
   } catch { /* notification failure should not block apply */ }
 }
@@ -126,6 +128,10 @@ export async function acceptApplicant(applicantId, postId) {
         post_id: postId,
       }))
       await supabase.from('notifications').insert(notifications)
+      // Send push to each applicant
+      notifications.forEach(record => {
+        supabase.functions.invoke('send-push', { body: { record } }).catch(() => {})
+      })
     }
   } catch { /* notification failure should not block accept */ }
 }
