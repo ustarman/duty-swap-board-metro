@@ -1,0 +1,17 @@
+{
+  "name": "Swap Board",
+  "short_name": "Swap Board",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#E11B22",
+  "start_url": "/duty-swap-board-metro/",
+  "icons": [
+    {
+      "src": "/duty-swap-board-metro/icon.jpg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
