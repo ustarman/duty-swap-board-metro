@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Header from '../components/Header'
 import SectionDivider from '../components/SectionDivider'
 import { useAuth } from '../context/AuthContext'
-import { fetchPost, applyToPost, acceptApplicant } from '../dataService'
+import { fetchPost, applyToPost, acceptApplicant, closePost } from '../dataService'
 import { AP_RED, CARD, BTN_PRIMARY, FIELD_LABEL } from '../theme'
 
 const WEEK_TYPE_LABEL = {
@@ -64,6 +64,16 @@ export default function PostDetail() {
       alert(err.message || 'Failed to apply.')
     } finally {
       setApplying(false)
+    }
+  }
+
+  const handleClose = async () => {
+    if (!confirm('Close this post? It will no longer accept applicants.')) return
+    try {
+      await closePost(post.id)
+      await loadPost()
+    } catch (err) {
+      alert(err.message || 'Failed to close post.')
     }
   }
 
@@ -220,6 +230,28 @@ export default function PostDetail() {
               ))}
             </div>
           </>
+        )}
+
+        {/* Close post — owner only, open posts */}
+        {isOwner && post.status === 'open' && (
+          <div style={{ marginTop: '1rem' }}>
+            <button
+              onClick={handleClose}
+              style={{
+                width: '100%',
+                padding: '13px',
+                borderRadius: 10,
+                border: `1.5px solid var(--card-border)`,
+                background: 'var(--card-bg)',
+                color: 'var(--subtext-color)',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Close This Post
+            </button>
+          </div>
         )}
 
         {/* Apply — non-owner */}
