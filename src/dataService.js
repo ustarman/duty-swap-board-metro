@@ -107,25 +107,12 @@ export async function acceptApplicant(applicantId, postId) {
     supabase.from('applicants').select('id, applicant_id').eq('post_id', postId),
   ])
 
-  // Accept selected applicant
-  const { error: e1 } = await supabase
-    .from('applicants')
-    .update({ status: 'accepted' })
-    .eq('id', applicantId)
-
-  if (e1) throw e1
-
-  // Reject all others on this post
-  const { error: e2 } = await supabase
-    .from('applicants')
-    .update({ status: 'rejected' })
-    .eq('post_id', postId)
-    .neq('id', applicantId)
-
-  if (e2) throw e2
-
-  // Close the post
-  await closePost(postId)
+  // Accept + reject others + close post — single atomic transaction (DB function)
+  const { error: txError } = await supabase.rpc('accept_applicant_tx', {
+    p_applicant_id: applicantId,
+    p_post_id: postId,
+  })
+  if (txError) throw txError
 
   // Notify all applicants
   try {
