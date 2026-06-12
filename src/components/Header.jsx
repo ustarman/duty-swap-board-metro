@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase'
 import { fetchUnreadCount } from '../dataService'
 import { AP_RED } from '../theme'
 
-export default function Header({ badge = 'Board' }) {
+export default function Header() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [unread, setUnread] = useState(0)
@@ -72,7 +72,7 @@ export default function Header({ badge = 'Board' }) {
       </svg>
       <div style={{ flex: 1 }}>
         <h1 style={{ fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.2 }}>
-          Duty Swap
+          Swap Board
         </h1>
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>Brisbane Transport</p>
       </div>
@@ -104,17 +104,6 @@ export default function Header({ badge = 'Board' }) {
             </span>
           )}
         </button>
-      )}
-
-      {badge && (
-        <span style={{
-          fontSize: 11, color: 'white',
-          border: '1px solid rgba(255,255,255,0.7)',
-          borderRadius: 4, padding: '2px 8px',
-          fontWeight: 700, flexShrink: 0,
-        }}>
-          {badge}
-        </span>
       )}
 
       {user && (
