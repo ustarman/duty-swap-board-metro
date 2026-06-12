@@ -17,6 +17,7 @@ function timeAgo(dateStr) {
 }
 
 const TYPE_CONFIG = {
+  new_post: { icon: '📢', bg: '#FFF7ED' },
   new_applicant: { icon: '👤', bg: '#EFF6FF' },
   accepted: { icon: '✅', bg: '#F0FDF4' },
   rejected: { icon: '❌', bg: '#FEF2F2' },

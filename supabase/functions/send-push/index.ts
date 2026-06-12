@@ -35,9 +35,10 @@ serve(async (req: Request) => {
 
     const type = record.type
     const title =
-      type === 'new_applicant' ? '👤 New Applicant'
-      : type === 'accepted'   ? '✅ Application Accepted'
-      :                         '📋 Application Update'
+      type === 'new_post'      ? '📢 New Swap Posted'
+      : type === 'new_applicant' ? '👤 New Applicant'
+      : type === 'accepted'    ? '✅ Application Accepted'
+      :                          '📋 Application Update'
 
     const url = record.post_id
       ? `https://ustarman.github.io/duty-swap-board-metro/post/${record.post_id}`

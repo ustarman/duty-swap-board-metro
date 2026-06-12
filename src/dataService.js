@@ -61,6 +61,28 @@ export async function createPost({ dutyNumber, weekCommencing, weekType, note, a
     .single()
 
   if (error) throw error
+
+  // Notify all other users about the new post
+  try {
+    const [{ data: others }, { data: authorProfile }] = await Promise.all([
+      supabase.from('profiles').select('id').neq('id', authorId),
+      supabase.from('profiles').select('full_name').eq('id', authorId).single(),
+    ])
+    if (others?.length) {
+      const posterName = authorProfile?.full_name || 'Someone'
+      const notifications = others.map(p => ({
+        user_id: p.id,
+        type: 'new_post',
+        message: `${posterName} posted a new swap: ${data.duty_number} (w/c ${data.week_commencing})`,
+        post_id: data.id,
+      }))
+      await supabase.from('notifications').insert(notifications)
+      notifications.forEach(record => {
+        supabase.functions.invoke('send-push', { body: { record } }).catch(() => {})
+      })
+    }
+  } catch { /* notification failure should not block posting */ }
+
   return data
 }
 
