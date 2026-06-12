@@ -2,7 +2,7 @@ self.addEventListener('push', event => {
   if (!event.data) return
   const data = event.data.json()
 
-  event.waitUntil(
+  const tasks = [
     self.registration.showNotification(data.title || 'Duty Swap Board', {
       body: data.body,
       icon: '/duty-swap-board-metro/icon-192.png',
@@ -10,8 +10,15 @@ self.addEventListener('push', event => {
       data: { url: data.url || '/duty-swap-board-metro/' },
       tag: 'duty-swap',
       renotify: true,
-    })
-  )
+    }),
+  ]
+
+  // App icon badge (iOS 16.4+ home-screen PWA, Android Chrome)
+  if (navigator.setAppBadge && data.badge) {
+    tasks.push(navigator.setAppBadge(data.badge).catch(() => {}))
+  }
+
+  event.waitUntil(Promise.all(tasks))
 })
 
 self.addEventListener('notificationclick', event => {
