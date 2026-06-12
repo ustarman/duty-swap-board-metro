@@ -33,6 +33,11 @@ export default function Header({ badge = 'Board' }) {
     try {
       const count = await fetchUnreadCount(user.id)
       setUnread(count)
+      // Sync app icon badge (iOS 16.4+ installed PWA, Android Chrome)
+      if ('setAppBadge' in navigator) {
+        if (count > 0) navigator.setAppBadge(count).catch(() => {})
+        else navigator.clearAppBadge().catch(() => {})
+      }
     } catch { /* silent */ }
   }
 

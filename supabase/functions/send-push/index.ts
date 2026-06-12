@@ -43,9 +43,20 @@ serve(async (req: Request) => {
       ? `https://ustarman.github.io/duty-swap-board-metro/post/${record.post_id}`
       : 'https://ustarman.github.io/duty-swap-board-metro/'
 
+    // Unread count for app icon badge
+    let badge = 0
+    try {
+      const { count } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', record.user_id)
+        .eq('is_read', false)
+      badge = count ?? 0
+    } catch (_) { /* badge is optional */ }
+
     await webpush.sendNotification(
       subData.subscription,
-      JSON.stringify({ title, body: record.message, url })
+      JSON.stringify({ title, body: record.message, url, badge })
     )
 
     return new Response('Push sent', { status: 200 })
