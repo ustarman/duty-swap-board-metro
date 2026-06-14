@@ -37,7 +37,7 @@ export default function PostNew() {
     try {
       await createPost({
         dutyNumber: form.dutyNumber.trim(),
-        weekCommencing: form.weekCommencing.toISOString().slice(0, 10),
+        weekCommencing: `${form.weekCommencing.getFullYear()}-${String(form.weekCommencing.getMonth() + 1).padStart(2, '0')}-${String(form.weekCommencing.getDate()).padStart(2, '0')}`,
         weekType: form.weekType,
         note: form.note.trim(),
         authorId: user.id,
