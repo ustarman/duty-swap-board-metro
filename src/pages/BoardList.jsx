@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import { AP_RED, CARD } from '../theme'
 import { fetchPosts } from '../dataService'
+import { formatDate } from '../utils/helpers'
 
 const WEEK_TYPE_LABEL = {
   'sunday': 'Sunday Only',
@@ -110,7 +111,7 @@ export default function BoardList() {
                     {post.profiles?.full_name}
                   </span>
                   <span style={{ fontSize: 11, color: 'var(--subtext-color)' }}>
-                    {post.created_at?.slice(0, 10)}
+                    {formatDate(post.created_at)}
                   </span>
                   {post.status === 'closed' && (
                     <span style={{
@@ -130,7 +131,7 @@ export default function BoardList() {
                   </span>
                   <span style={{ fontSize: 11, color: 'var(--subtext-color)' }}>·</span>
                   <span style={{ fontSize: 12, color: 'var(--subtext-color)' }}>
-                    w/c {post.week_commencing}
+                    w/c {formatDate(post.week_commencing)}
                   </span>
                 </div>
 

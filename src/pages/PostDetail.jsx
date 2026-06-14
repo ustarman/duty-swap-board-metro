@@ -6,6 +6,7 @@ import Dialog from '../components/Dialog'
 import { useAuth } from '../context/AuthContext'
 import { useDialog } from '../hooks/useDialog'
 import { fetchPost, applyToPost, acceptApplicant, closePost, withdrawApplication } from '../dataService'
+import { formatDate } from '../utils/helpers'
 import { AP_RED, CARD, BTN_PRIMARY, FIELD_LABEL } from '../theme'
 
 const WEEK_TYPE_LABEL = {
@@ -188,7 +189,7 @@ export default function PostDetail() {
               <Avatar name={post.profiles?.full_name} />
               <div>
                 <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-color)' }}>{post.profiles?.full_name}</p>
-                <p style={{ fontSize: 11, color: 'var(--subtext-color)' }}>Posted {post.created_at?.slice(0, 10)}</p>
+                <p style={{ fontSize: 11, color: 'var(--subtext-color)' }}>Posted {formatDate(post.created_at)}</p>
               </div>
             </div>
             <span style={{
@@ -221,7 +222,7 @@ export default function PostDetail() {
 
           <div style={{ marginBottom: post.note ? 12 : 0 }}>
             <span style={{ fontSize: 11, color: 'var(--subtext-color)', fontWeight: 600, display: 'block', marginBottom: 2 }}>WEEK COMMENCING</span>
-            <span style={{ fontSize: 14, color: 'var(--text-color)', fontWeight: 500 }}>{post.week_commencing}</span>
+            <span style={{ fontSize: 14, color: 'var(--text-color)', fontWeight: 500 }}>{formatDate(post.week_commencing)}</span>
           </div>
 
           {post.note && (
@@ -264,7 +265,7 @@ export default function PostDetail() {
                         {a.duty_number && (
                           <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--ap-red, #E3000B)', marginTop: 1 }}>{a.duty_number}</p>
                         )}
-                        <p style={{ fontSize: 11, color: 'var(--subtext-color)' }}>{a.created_at?.slice(0, 10)}</p>
+                        <p style={{ fontSize: 11, color: 'var(--subtext-color)' }}>{formatDate(a.created_at)}</p>
                       </div>
                     </div>
                     <div>
