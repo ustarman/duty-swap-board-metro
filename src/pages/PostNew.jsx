@@ -15,6 +15,14 @@ const WEEK_TYPES = [
   { label: 'Mon to Fri', value: 'mon-fri' },
 ]
 
+// Normalize a duty number: trim, uppercase, add "BT" prefix to bare numbers.
+// "100" -> "BT100", "bt100" -> "BT100", "rdo" -> "RDO"
+function normalizeDuty(value) {
+  const v = (value || '').trim().toUpperCase()
+  if (/^\d+$/.test(v)) return 'BT' + v
+  return v
+}
+
 export default function PostNew() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -36,7 +44,7 @@ export default function PostNew() {
     setSubmitting(true)
     try {
       await createPost({
-        dutyNumber: form.dutyNumber.trim(),
+        dutyNumber: normalizeDuty(form.dutyNumber),
         weekCommencing: `${form.weekCommencing.getFullYear()}-${String(form.weekCommencing.getMonth() + 1).padStart(2, '0')}-${String(form.weekCommencing.getDate()).padStart(2, '0')}`,
         weekType: form.weekType,
         note: form.note.trim(),
