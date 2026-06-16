@@ -64,8 +64,6 @@ export default function PostNew() {
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
         padding: '12px 1rem',
-        borderBottom: '1px solid var(--divider-color)',
-        background: 'var(--card-bg)',
       }}>
         <button
           onClick={() => navigate(-1)}

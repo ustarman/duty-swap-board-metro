@@ -62,35 +62,40 @@ export default function Login() {
 
       <Header />
 
-      {/* Mode toggle */}
-      <div style={{
-        display: 'flex',
-        background: 'var(--tab-bg)',
-        borderBottom: '1px solid var(--tab-border)',
-      }}>
-        {[
-          { key: 'login', label: 'Sign In' },
-          { key: 'signup', label: 'Create Account' },
-        ].map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => { setMode(tab.key); setError(''); setSuccess('') }}
-            style={{
-              flex: 1,
-              padding: '12px 0',
-              fontSize: 13,
-              fontWeight: 600,
-              border: 'none',
-              background: 'transparent',
-              color: mode === tab.key ? AP_RED : 'var(--tab-color)',
-              borderBottom: `2px solid ${mode === tab.key ? AP_RED : 'transparent'}`,
-              cursor: 'pointer',
-              transition: 'all 0.15s',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Mode toggle — segmented control */}
+      <div style={{ padding: '1.25rem 1.25rem 0' }}>
+        <div style={{
+          display: 'flex',
+          background: 'var(--input-bg)',
+          border: '0.5px solid var(--card-border)',
+          borderRadius: 999,
+          padding: 4,
+          gap: 4,
+        }}>
+          {[
+            { key: 'login', label: 'Sign In' },
+            { key: 'signup', label: 'Create Account' },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => { setMode(tab.key); setError(''); setSuccess('') }}
+              style={{
+                flex: 1,
+                padding: '9px 0',
+                fontSize: 13,
+                fontWeight: 600,
+                border: 'none',
+                borderRadius: 999,
+                background: mode === tab.key ? AP_RED : 'transparent',
+                color: mode === tab.key ? 'white' : 'var(--tab-color)',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div style={{ flex: 1, padding: '1.25rem', paddingBottom: '2rem' }}>

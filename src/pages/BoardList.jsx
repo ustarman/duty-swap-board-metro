@@ -46,38 +46,40 @@ export default function BoardList() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100svh', background: 'var(--app-bg)' }}>
       <Header />
 
-      {/* Filter tabs */}
-      <div style={{
-        display: 'flex',
-        gap: 8,
-        padding: '10px 1rem',
-        background: 'var(--card-bg)',
-        borderBottom: '1px solid var(--tab-border)',
-        flexShrink: 0,
-      }}>
-        {TABS.map(tab => {
-          const active = filter === tab.key
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setFilter(tab.key)}
-              style={{
-                flex: 1,
-                padding: '8px 4px',
-                fontSize: 13,
-                fontWeight: 600,
-                border: `1.5px solid ${active ? AP_RED : 'var(--tab-border)'}`,
-                borderRadius: 8,
-                background: active ? AP_RED : 'var(--tab-bg)',
-                color: active ? 'white' : 'var(--tab-color)',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-              }}
-            >
-              {tab.label}
-            </button>
-          )
-        })}
+      {/* Filter tabs — segmented control */}
+      <div style={{ padding: '12px 1rem 4px', flexShrink: 0 }}>
+        <div style={{
+          display: 'flex',
+          background: 'var(--input-bg)',
+          border: '0.5px solid var(--card-border)',
+          borderRadius: 999,
+          padding: 4,
+          gap: 4,
+        }}>
+          {TABS.map(tab => {
+            const active = filter === tab.key
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setFilter(tab.key)}
+                style={{
+                  flex: 1,
+                  padding: '8px 0',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  border: 'none',
+                  borderRadius: 999,
+                  background: active ? AP_RED : 'transparent',
+                  color: active ? 'white' : 'var(--tab-color)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {tab.label}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Content */}
