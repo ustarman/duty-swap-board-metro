@@ -74,8 +74,11 @@ export default function Header() {
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <path d="M7 16V4m0 0L3 8m4-4l4 4" />
-          <path d="M17 8v12m0 0l4-4m-4 4l-4-4" />
+          <rect x="5" y="4" width="14" height="17" rx="1.5" />
+          <path d="M9 4V2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5V4" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="16" y2="14" />
+          <line x1="8" y1="18" x2="13" y2="18" />
         </svg>
       </div>
       <div style={{ flex: 1 }}>
