@@ -40,13 +40,16 @@ export default function Dialog({ dialog, inputValue, onInputChange, onConfirm, o
             placeholder={dialog.placeholder || ''}
             autoFocus
             style={{
+              display: 'block',
               width: '100%',
+              maxWidth: '100%',
+              minWidth: 0,
               padding: '10px 12px',
               borderRadius: 10,
               border: `1.5px solid ${AP_RED}`,
               background: 'var(--input-bg)',
               color: 'var(--text-color)',
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: 500,
               marginBottom: '1.25rem',
               boxSizing: 'border-box',

@@ -206,9 +206,10 @@ export default function PostDetail() {
               placeholder="e.g. BT135, Spare, RDO"
               autoFocus
               style={{
-                width: '100%', padding: '10px 12px', borderRadius: 10,
+                display: 'block', width: '100%', maxWidth: '100%', minWidth: 0,
+                padding: '10px 12px', borderRadius: 10,
                 border: `1.5px solid ${AP_RED}`, background: 'var(--input-bg)',
-                color: 'var(--text-color)', fontSize: 15, fontWeight: 500,
+                color: 'var(--text-color)', fontSize: 16, fontWeight: 500,
                 marginBottom: isApplyRDO ? '1.25rem' : '0.75rem',
                 boxSizing: 'border-box', outline: 'none',
               }}
@@ -223,9 +224,10 @@ export default function PostDetail() {
                   value={applyStartTime}
                   onChange={e => setApplyStartTime(e.target.value)}
                   style={{
-                    width: '100%', padding: '10px 12px', borderRadius: 10,
+                    display: 'block', width: '100%', maxWidth: '100%', minWidth: 0,
+                    padding: '10px 12px', borderRadius: 10,
                     border: '1.5px solid var(--card-border)', background: 'var(--input-bg)',
-                    color: 'var(--text-color)', fontSize: 15, fontWeight: 500,
+                    color: 'var(--text-color)', fontSize: 16, fontWeight: 500,
                     boxSizing: 'border-box', outline: 'none',
                   }}
                 />

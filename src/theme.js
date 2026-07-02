@@ -25,7 +25,10 @@ export const INPUT_LABEL = {
 }
 
 export const INPUT_STYLE = {
+  display: 'block',
   width: '100%',
+  maxWidth: '100%',
+  minWidth: 0,
   border: 'none',
   background: 'transparent',
   fontSize: 16,
