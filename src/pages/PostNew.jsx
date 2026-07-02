@@ -29,6 +29,7 @@ export default function PostNew() {
   const [form, setForm] = useState({
     weekCommencing: null,
     dutyNumber: '',
+    startTime: '',
     weekType: null,
     note: '',
   })
@@ -39,6 +40,7 @@ export default function PostNew() {
     setError('')
     if (!form.weekCommencing) { setError('Week Commencing date is required'); return }
     if (!form.dutyNumber.trim()) { setError('Duty number is required'); return }
+    if (!form.startTime) { setError('Duty start time is required'); return }
     if (!form.weekType) { setError('Please select the days you want to swap'); return }
 
     setSubmitting(true)
@@ -46,6 +48,7 @@ export default function PostNew() {
       await createPost({
         dutyNumber: normalizeDuty(form.dutyNumber),
         weekCommencing: `${form.weekCommencing.getFullYear()}-${String(form.weekCommencing.getMonth() + 1).padStart(2, '0')}-${String(form.weekCommencing.getDate()).padStart(2, '0')}`,
+        startTime: form.startTime,
         weekType: form.weekType,
         note: form.note.trim(),
         authorId: user.id,
@@ -99,7 +102,7 @@ export default function PostNew() {
             </InputBox>
           </div>
 
-          <div>
+          <div style={{ marginBottom: '0.75rem' }}>
             <span style={FIELD_LABEL}>My Duty Number</span>
             <InputBox>
               <span style={INPUT_LABEL}>DUTY NO.</span>
@@ -109,6 +112,19 @@ export default function PostNew() {
                 onChange={e => setForm({ ...form, dutyNumber: e.target.value.toUpperCase() })}
                 placeholder="e.g. BT135"
                 style={INPUT_STYLE}
+              />
+            </InputBox>
+          </div>
+
+          <div>
+            <span style={FIELD_LABEL}>Duty Start Time</span>
+            <InputBox>
+              <span style={INPUT_LABEL}>START</span>
+              <input
+                type="time"
+                value={form.startTime}
+                onChange={e => setForm({ ...form, startTime: e.target.value })}
+                style={{ ...INPUT_STYLE, cursor: 'pointer' }}
               />
             </InputBox>
           </div>

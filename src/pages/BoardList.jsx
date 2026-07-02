@@ -135,13 +135,20 @@ export default function BoardList() {
                   <span style={{ fontSize: 12, color: 'var(--subtext-color)' }}>
                     w/c {formatDate(post.week_commencing)}
                   </span>
+                  {post.start_time && (
+                    <>
+                      <span style={{ fontSize: 11, color: 'var(--subtext-color)' }}>·</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-color)' }}>
+                        {post.start_time}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <span style={{
-                  fontSize: 11, fontWeight: 600,
-                  background: 'var(--input-bg)', color: 'var(--label-color)',
+                  fontSize: 11, fontWeight: 700,
+                  background: AP_RED, color: 'white',
                   padding: '2px 8px', borderRadius: 20,
-                  border: '1px solid var(--card-border)',
                   display: 'inline-block',
                   marginBottom: post.note ? 6 : 0,
                 }}>

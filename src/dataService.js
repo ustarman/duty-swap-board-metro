@@ -47,12 +47,13 @@ export async function withdrawApplication(applicationId) {
   if (error) throw error
 }
 
-export async function createPost({ dutyNumber, weekCommencing, weekType, note, authorId }) {
+export async function createPost({ dutyNumber, weekCommencing, startTime, weekType, note, authorId }) {
   const { data, error } = await supabase
     .from('posts')
     .insert({
       duty_number: dutyNumber,
       week_commencing: weekCommencing,
+      start_time: startTime || null,
       week_type: weekType,
       note: note || null,
       author_id: authorId,

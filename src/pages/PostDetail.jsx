@@ -208,19 +208,26 @@ export default function PostDetail() {
                 {post.duty_number}
               </span>
               <span style={{
-                fontSize: 12, fontWeight: 600,
-                background: 'var(--input-bg)', color: 'var(--label-color)',
+                fontSize: 12, fontWeight: 700,
+                background: AP_RED, color: 'white',
                 padding: '3px 10px', borderRadius: 20,
-                border: '1px solid var(--card-border)',
               }}>
                 {WEEK_TYPE_LABEL[post.week_type]}
               </span>
             </div>
           </div>
 
-          <div style={{ marginBottom: post.note ? 12 : 0 }}>
-            <span style={{ fontSize: 11, color: 'var(--subtext-color)', fontWeight: 600, display: 'block', marginBottom: 2 }}>WEEK COMMENCING</span>
-            <span style={{ fontSize: 14, color: 'var(--text-color)', fontWeight: 500 }}>{formatDate(post.week_commencing)}</span>
+          <div style={{ display: 'flex', gap: 32, marginBottom: post.note ? 12 : 0 }}>
+            <div>
+              <span style={{ fontSize: 11, color: 'var(--subtext-color)', fontWeight: 600, display: 'block', marginBottom: 2 }}>WEEK COMMENCING</span>
+              <span style={{ fontSize: 14, color: 'var(--text-color)', fontWeight: 500 }}>{formatDate(post.week_commencing)}</span>
+            </div>
+            {post.start_time && (
+              <div>
+                <span style={{ fontSize: 11, color: 'var(--subtext-color)', fontWeight: 600, display: 'block', marginBottom: 2 }}>START TIME</span>
+                <span style={{ fontSize: 14, color: 'var(--text-color)', fontWeight: 500 }}>{post.start_time}</span>
+              </div>
+            )}
           </div>
 
           {post.note && (
