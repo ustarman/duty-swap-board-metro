@@ -66,7 +66,7 @@ export async function createPost({ dutyNumber, weekCommencing, startTime, weekTy
   // Notify all other users about the new post
   try {
     const [{ data: others }, { data: authorProfile }] = await Promise.all([
-      supabase.from('profiles').select('id').neq('id', authorId),
+      supabase.from('profiles').select('id, email').neq('id', authorId),
       supabase.from('profiles').select('full_name').eq('id', authorId).single(),
     ])
     if (others?.length) {
@@ -81,6 +81,13 @@ export async function createPost({ dutyNumber, weekCommencing, startTime, weekTy
       notifications.forEach(record => {
         supabase.functions.invoke('send-push', { body: { record } }).catch(() => {})
       })
+      // Email everyone (except the poster) about the new post
+      const recipients = others.filter(p => p.email).map(p => ({ email: p.email }))
+      if (recipients.length) {
+        supabase.functions.invoke('send-board-email', {
+          body: { type: 'new_post', post: data, recipients },
+        }).catch(() => {})
+      }
     }
   } catch { /* notification failure should not block posting */ }
 
@@ -107,7 +114,7 @@ export async function applyToPost(postId, applicantId, dutyNumber = '') {
   // Notify post owner
   try {
     const [{ data: post }, { data: applicantProfile }] = await Promise.all([
-      supabase.from('posts').select('author_id, duty_number').eq('id', postId).single(),
+      supabase.from('posts').select('id, author_id, duty_number, week_commencing').eq('id', postId).single(),
       supabase.from('profiles').select('full_name').eq('id', applicantId).single(),
     ])
     if (post && applicantProfile) {
@@ -119,6 +126,20 @@ export async function applyToPost(postId, applicantId, dutyNumber = '') {
       }
       await supabase.from('notifications').insert(record)
       supabase.functions.invoke('send-push', { body: { record } }).catch(() => {})
+      // Email the post owner about the new applicant
+      const { data: owner } = await supabase
+        .from('profiles').select('email').eq('id', post.author_id).single()
+      if (owner?.email) {
+        supabase.functions.invoke('send-board-email', {
+          body: {
+            type: 'new_applicant',
+            post,
+            applicantName: applicantProfile.full_name,
+            applicantDutyNumber: dutyNumber || null,
+            recipients: [{ email: owner.email }],
+          },
+        }).catch(() => {})
+      }
     }
   } catch { /* notification failure should not block apply */ }
 }
