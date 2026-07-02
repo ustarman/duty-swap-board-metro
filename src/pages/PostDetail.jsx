@@ -32,12 +32,18 @@ export default function PostDetail() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { user } = useAuth()
-  const { dialog, inputValue, setInputValue, showConfirm, showAlert, showInput, handleConfirm, handleCancel } = useDialog()
+  const { dialog, inputValue, setInputValue, showConfirm, showAlert, handleConfirm, handleCancel } = useDialog()
 
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [applying, setApplying] = useState(false)
+
+  const [showApplyModal, setShowApplyModal] = useState(false)
+  const [applyDutyNumber, setApplyDutyNumber] = useState('')
+  const [applyStartTime, setApplyStartTime] = useState('')
+  const [applyError, setApplyError] = useState('')
+  const isApplyRDO = applyDutyNumber.trim().toUpperCase() === 'RDO'
 
   useEffect(() => { loadPost() }, [id])
 
@@ -58,25 +64,32 @@ export default function PostDetail() {
   const hasAccepted = post?.applicants?.some(a => a.status === 'accepted')
   const myApplication = post?.applicants?.find(a => a.applicant_id === user?.id)
 
-  const handleApply = async () => {
+  const openApplyModal = async () => {
     if (hasApplied) {
       await showAlert('You have already applied for this swap.')
       return
     }
-    const dutyNumber = await showInput(
-      'Enter your duty number so the poster can consider your swap.',
-      { confirmLabel: 'Apply', title: 'Apply for This Swap', placeholder: 'e.g. BT135, Spare, RDO' }
-    )
-    if (dutyNumber === false) return
+    setApplyDutyNumber('')
+    setApplyStartTime('')
+    setApplyError('')
+    setShowApplyModal(true)
+  }
+
+  const handleApply = async () => {
+    if (!applyDutyNumber.trim()) { setApplyError('Duty number is required'); return }
+    if (!isApplyRDO && !applyStartTime) { setApplyError('Start time is required'); return }
+    setApplyError('')
     setApplying(true)
     try {
-      await applyToPost(post.id, user.id, dutyNumber)
+      await applyToPost(post.id, user.id, applyDutyNumber.trim(), isApplyRDO ? '' : applyStartTime)
+      setShowApplyModal(false)
       await loadPost()
     } catch (err) {
       if (err.message?.includes('duplicate key') || err.message?.includes('unique constraint')) {
+        setShowApplyModal(false)
         await showAlert('You have already applied for this swap.')
       } else {
-        await showAlert(err.message || 'Failed to apply.')
+        setApplyError(err.message || 'Failed to apply.')
       }
     } finally {
       setApplying(false)
@@ -164,6 +177,91 @@ export default function PostDetail() {
       <Header />
 
       <Dialog dialog={dialog} inputValue={inputValue} onInputChange={setInputValue} onConfirm={handleConfirm} onCancel={handleCancel} />
+
+      {showApplyModal && (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.45)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 9999, padding: '1.5rem',
+        }}>
+          <div style={{
+            background: 'var(--card-bg)',
+            borderRadius: 18,
+            padding: '1.5rem',
+            width: '100%',
+            maxWidth: 300,
+            boxShadow: '0 24px 60px rgba(0,0,0,0.25)',
+          }}>
+            <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-color)', marginBottom: 8, textAlign: 'center' }}>
+              Apply for This Swap
+            </p>
+            <p style={{ fontSize: 14, color: 'var(--text-color)', lineHeight: 1.55, marginBottom: '0.75rem', textAlign: 'center' }}>
+              Enter your duty number so the poster can consider your swap.
+            </p>
+            <input
+              type="text"
+              value={applyDutyNumber}
+              onChange={e => setApplyDutyNumber(e.target.value)}
+              placeholder="e.g. BT135, Spare, RDO"
+              autoFocus
+              style={{
+                width: '100%', padding: '10px 12px', borderRadius: 10,
+                border: `1.5px solid ${AP_RED}`, background: 'var(--input-bg)',
+                color: 'var(--text-color)', fontSize: 15, fontWeight: 500,
+                marginBottom: isApplyRDO ? '1.25rem' : '0.75rem',
+                boxSizing: 'border-box', outline: 'none',
+              }}
+            />
+            {!isApplyRDO && (
+              <div style={{ marginBottom: '1.25rem' }}>
+                <span style={{ fontSize: 11, color: 'var(--subtext-color)', fontWeight: 600, display: 'block', marginBottom: 4 }}>
+                  START TIME
+                </span>
+                <input
+                  type="time"
+                  value={applyStartTime}
+                  onChange={e => setApplyStartTime(e.target.value)}
+                  style={{
+                    width: '100%', padding: '10px 12px', borderRadius: 10,
+                    border: '1.5px solid var(--card-border)', background: 'var(--input-bg)',
+                    color: 'var(--text-color)', fontSize: 15, fontWeight: 500,
+                    boxSizing: 'border-box', outline: 'none',
+                  }}
+                />
+              </div>
+            )}
+            {applyError && (
+              <p style={{ fontSize: 12, color: AP_RED, fontWeight: 600, marginBottom: '0.75rem', textAlign: 'center' }}>
+                {applyError}
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => setShowApplyModal(false)}
+                style={{
+                  flex: 1, padding: '12px', border: '1.5px solid var(--card-border)',
+                  borderRadius: 10, background: 'transparent',
+                  color: 'var(--text-color)', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApply}
+                disabled={applying}
+                style={{
+                  flex: 1, padding: '12px', border: 'none', borderRadius: 10,
+                  background: AP_RED, color: 'white', fontSize: 14, fontWeight: 700,
+                  cursor: 'pointer', opacity: applying ? 0.6 : 1,
+                }}
+              >
+                {applying ? 'Applying...' : 'Apply'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
@@ -268,9 +366,12 @@ export default function PostDetail() {
                       <div>
                         <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-color)' }}>{a.profiles?.full_name}</p>
                         {a.duty_number && (
-                          <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--ap-red, #E3000B)', marginTop: 1 }}>{a.duty_number}</p>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--ap-red, #E3000B)', marginTop: 1 }}>
+                            {a.duty_number}
+                            {a.start_time && <span style={{ color: 'var(--subtext-color)', fontWeight: 600 }}> · {a.start_time}</span>}
+                          </p>
                         )}
-                        <p style={{ fontSize: 11, color: 'var(--subtext-color)' }}>{formatDate(a.created_at)}</p>
+                        <p style={{ fontSize: 11, color: 'var(--subtext-color)' }}>Applied: {formatDate(a.created_at)}</p>
                       </div>
                     </div>
                     <div>
@@ -340,7 +441,10 @@ export default function PostDetail() {
                   <>
                     <p style={{ fontSize: 15, fontWeight: 700, color: '#15803D', marginBottom: 4 }}>✓ Application Submitted</p>
                     {myApplication?.duty_number && (
-                      <p style={{ fontSize: 12, color: 'var(--subtext-color)', marginBottom: 4 }}>Your duty: <strong>{myApplication.duty_number}</strong></p>
+                      <p style={{ fontSize: 12, color: 'var(--subtext-color)', marginBottom: 4 }}>
+                        Your duty: <strong>{myApplication.duty_number}</strong>
+                        {myApplication.start_time && <> · <strong>{myApplication.start_time}</strong></>}
+                      </p>
                     )}
                     <p style={{ fontSize: 12, color: 'var(--subtext-color)', marginBottom: '1rem' }}>You'll be notified when the poster responds.</p>
                     <button
@@ -363,7 +467,7 @@ export default function PostDetail() {
                 <p style={{ fontSize: 12, color: 'var(--subtext-color)', marginTop: 4 }}>The start date has already passed.</p>
               </div>
             ) : (
-              <button onClick={handleApply} disabled={applying} style={{ ...BTN_PRIMARY, opacity: applying ? 0.6 : 1 }}>
+              <button onClick={openApplyModal} disabled={applying} style={{ ...BTN_PRIMARY, opacity: applying ? 0.6 : 1 }}>
                 {applying ? 'Applying...' : 'Apply for This Swap'}
               </button>
             )}

@@ -25,7 +25,7 @@ serve(async (req) => {
   }
 
   try {
-    const { type, post, recipients, applicantName, applicantDutyNumber } = await req.json()
+    const { type, post, recipients, applicantName, applicantDutyNumber, applicantStartTime } = await req.json()
     const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY')
 
     if (!BREVO_API_KEY) {
@@ -64,6 +64,7 @@ serve(async (req) => {
       html = '<p>Hi,</p><p><strong>' + (applicantName || 'Someone') + '</strong> has applied for your duty swap request.</p>'
       html += '<p><strong>Your Duty:</strong> ' + post.duty_number + '<br/>'
       if (applicantDutyNumber) html += '<strong>Applicant\'s Duty:</strong> ' + applicantDutyNumber + '<br/>'
+      if (applicantStartTime) html += '<strong>Applicant\'s Start Time:</strong> ' + applicantStartTime + '<br/>'
       html += '<strong>Week Commencing:</strong> ' + post.week_commencing + '</p>'
       html += '<p><a href="' + boardUrl + '">Click here to review the applicant</a></p>'
       html += '<p>Regards,<br/>Swap Board – Brisbane Transport</p>'

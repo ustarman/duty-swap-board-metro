@@ -1,4 +1,5 @@
 import { supabase } from './lib/supabase'
+import { isExpired } from './utils/helpers'
 
 // Posts
 export async function fetchPosts(status = null) {
@@ -26,7 +27,7 @@ export async function fetchPost(id) {
         *,
         profiles:author_id (full_name, employee_id),
         applicants (
-          id, applicant_id, status, created_at, duty_number,
+          id, applicant_id, status, created_at, duty_number, start_time,
           profiles:applicant_id (full_name, employee_id)
         )
       `)
@@ -104,19 +105,27 @@ export async function closePost(postId) {
 }
 
 // Applicants
-export async function applyToPost(postId, applicantId, dutyNumber = '') {
+export async function applyToPost(postId, applicantId, dutyNumber = '', startTime = '') {
+  const { data: post, error: postError } = await supabase
+    .from('posts')
+    .select('id, author_id, duty_number, week_commencing, status')
+    .eq('id', postId)
+    .single()
+  if (postError) throw postError
+  if (!post || post.status !== 'open' || isExpired(post)) {
+    throw new Error('This post is no longer accepting applications.')
+  }
+
   const { error } = await supabase
     .from('applicants')
-    .insert({ post_id: postId, applicant_id: applicantId, duty_number: dutyNumber || null })
+    .insert({ post_id: postId, applicant_id: applicantId, duty_number: dutyNumber || null, start_time: startTime || null })
 
   if (error) throw error
 
   // Notify post owner
   try {
-    const [{ data: post }, { data: applicantProfile }] = await Promise.all([
-      supabase.from('posts').select('id, author_id, duty_number, week_commencing').eq('id', postId).single(),
-      supabase.from('profiles').select('full_name').eq('id', applicantId).single(),
-    ])
+    const { data: applicantProfile } = await supabase
+      .from('profiles').select('full_name').eq('id', applicantId).single()
     if (post && applicantProfile) {
       const record = {
         user_id: post.author_id,
@@ -136,6 +145,7 @@ export async function applyToPost(postId, applicantId, dutyNumber = '') {
             post,
             applicantName: applicantProfile.full_name,
             applicantDutyNumber: dutyNumber || null,
+            applicantStartTime: startTime || null,
             recipients: [{ email: owner.email }],
           },
         }).catch(() => {})
