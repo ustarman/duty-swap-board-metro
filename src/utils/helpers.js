@@ -16,3 +16,14 @@ export function formatDate(value) {
   const yyyy = date.getFullYear()
   return `${dd}/${mm}/${yyyy}`
 }
+
+// A post is "expired" if it's still open but its start date (week_commencing)
+// has already passed — no applicant was accepted before the duty started.
+export function isExpired(post) {
+  if (!post || post.status !== 'open' || !post.week_commencing) return false
+  const [year, month, day] = post.week_commencing.split('-').map(Number)
+  const weekCommencing = new Date(year, month - 1, day)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return weekCommencing < today
+}

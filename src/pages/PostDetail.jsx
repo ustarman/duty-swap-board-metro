@@ -6,7 +6,7 @@ import Dialog from '../components/Dialog'
 import { useAuth } from '../context/AuthContext'
 import { useDialog } from '../hooks/useDialog'
 import { fetchPost, applyToPost, acceptApplicant, closePost, withdrawApplication } from '../dataService'
-import { formatDate } from '../utils/helpers'
+import { formatDate, isExpired } from '../utils/helpers'
 import { AP_RED, CARD, BTN_PRIMARY, FIELD_LABEL } from '../theme'
 
 const WEEK_TYPE_LABEL = {
@@ -192,12 +192,12 @@ export default function PostDetail() {
             </div>
             <span style={{
               fontSize: 10, fontWeight: 700,
-              background: post.status === 'open' ? '#F0FDF4' : 'var(--input-bg)',
-              color: post.status === 'open' ? '#15803D' : 'var(--subtext-color)',
-              border: `1px solid ${post.status === 'open' ? '#BBF7D0' : 'var(--card-border)'}`,
+              background: post.status === 'open' && !isExpired(post) ? '#F0FDF4' : 'var(--input-bg)',
+              color: post.status === 'open' && !isExpired(post) ? '#15803D' : 'var(--subtext-color)',
+              border: `1px solid ${post.status === 'open' && !isExpired(post) ? '#BBF7D0' : 'var(--card-border)'}`,
               padding: '3px 10px', borderRadius: 20,
             }}>
-              {post.status === 'open' ? 'OPEN' : 'CLOSED'}
+              {isExpired(post) ? 'EXPIRED' : post.status === 'open' ? 'OPEN' : 'CLOSED'}
             </span>
           </div>
 
@@ -356,6 +356,11 @@ export default function PostDetail() {
                     </button>
                   </>
                 )}
+              </div>
+            ) : isExpired(post) ? (
+              <div style={{ ...CARD, textAlign: 'center', padding: '1.25rem', marginBottom: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--subtext-color)' }}>This post has expired</p>
+                <p style={{ fontSize: 12, color: 'var(--subtext-color)', marginTop: 4 }}>The start date has already passed.</p>
               </div>
             ) : (
               <button onClick={handleApply} disabled={applying} style={{ ...BTN_PRIMARY, opacity: applying ? 0.6 : 1 }}>

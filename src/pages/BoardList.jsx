@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import { AP_RED, CARD } from '../theme'
 import { fetchPosts } from '../dataService'
-import { formatDate } from '../utils/helpers'
+import { formatDate, isExpired } from '../utils/helpers'
 
 const WEEK_TYPE_LABEL = {
   'sunday': 'Sunday Only',
@@ -32,9 +32,18 @@ export default function BoardList() {
     setLoading(true)
     setError('')
     try {
-      const status = filter === 'all' ? null : filter
-      const data = await fetchPosts(status)
-      setPosts(data)
+      if (filter === 'open') {
+        const data = await fetchPosts('open')
+        setPosts(data.filter(p => !isExpired(p)))
+      } else if (filter === 'closed') {
+        const [closed, open] = await Promise.all([fetchPosts('closed'), fetchPosts('open')])
+        const expired = open.filter(isExpired)
+        const merged = [...closed, ...expired].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        setPosts(merged)
+      } else {
+        const data = await fetchPosts(null)
+        setPosts(data)
+      }
     } catch (err) {
       setError('Failed to load posts.')
     } finally {
@@ -123,6 +132,16 @@ export default function BoardList() {
                       border: '1px solid var(--card-border)',
                     }}>
                       CLOSED
+                    </span>
+                  )}
+                  {isExpired(post) && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700,
+                      background: 'var(--input-bg)', color: 'var(--subtext-color)',
+                      padding: '2px 7px', borderRadius: 20,
+                      border: '1px solid var(--card-border)',
+                    }}>
+                      EXPIRED
                     </span>
                   )}
                 </div>
