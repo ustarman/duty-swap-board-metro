@@ -7,7 +7,7 @@ import { AP_RED, AP_RED_GRADIENT } from '../theme'
 import Swoosh from './Swoosh'
 
 export default function Header() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [unread, setUnread] = useState(0)
 
@@ -40,11 +40,6 @@ export default function Header() {
         else navigator.clearAppBadge().catch(() => {})
       }
     } catch { /* silent */ }
-  }
-
-  const handleSignOut = async () => {
-    await signOut()
-    navigate('/')
   }
 
   return (
@@ -114,21 +109,6 @@ export default function Header() {
               {unread > 9 ? '9+' : unread}
             </span>
           )}
-        </button>
-      )}
-
-      {user && (
-        <button
-          onClick={handleSignOut}
-          style={{
-            background: 'rgba(255,255,255,0.15)',
-            border: '1px solid rgba(255,255,255,0.5)',
-            borderRadius: 6, color: 'white',
-            fontSize: 11, fontWeight: 600,
-            padding: '4px 10px', cursor: 'pointer', flexShrink: 0,
-          }}
-        >
-          Sign Out
         </button>
       )}
 
