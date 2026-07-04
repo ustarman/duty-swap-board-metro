@@ -10,8 +10,7 @@ const mockClient = {
   auth: {
     getSession: async () => ({ data: { session: null } }),
     onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-    signInWithPassword: async () => { throw new Error('Supabase not connected yet') },
-    signUp: async () => { throw new Error('Supabase not connected yet') },
+    setSession: async () => ({ data: { session: null }, error: null }),
     signOut: async () => {},
   },
   from: () => ({ select: () => ({ eq: () => ({ single: async () => ({ data: null }) }) }), insert: async () => ({}) }),

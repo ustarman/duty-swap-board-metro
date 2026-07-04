@@ -1,14 +1,33 @@
 // Edge Function: send-board-email
 // Sends Swap Board notification emails via Brevo.
-// Secrets required (Supabase Dashboard → Edge Functions → Secrets): BREVO_API_KEY
+// Recipients are passed as auth user IDs; the function resolves each user's
+// personal login email server-side (service role) — the client never sees emails.
+// Secrets required: BREVO_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
 // NOTE: This file is a backup of the deployed function. If you edit it here,
 // you must re-deploy via `supabase functions deploy send-board-email`.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+// Resolve auth user IDs -> personal login emails via the service role.
+async function resolveEmails(userIds: string[]): Promise<string[]> {
+  const ids = [...new Set((userIds || []).filter(Boolean))]
+  if (ids.length === 0) return []
+  const admin = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+  )
+  const emails: string[] = []
+  await Promise.all(ids.map(async (id) => {
+    const { data, error } = await admin.auth.admin.getUserById(id)
+    if (!error && data?.user?.email) emails.push(data.user.email)
+  }))
+  return emails
 }
 
 const SENDER = { name: 'Swap Board – Brisbane Transport', email: 'heycomeon@gmail.com' }
@@ -25,7 +44,7 @@ serve(async (req) => {
   }
 
   try {
-    const { type, post, recipients, applicantName, applicantDutyNumber, applicantStartTime } = await req.json()
+    const { type, post, recipientUserIds, applicantName, applicantDutyNumber, applicantStartTime } = await req.json()
     const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY')
 
     if (!BREVO_API_KEY) {
@@ -34,8 +53,8 @@ serve(async (req) => {
       })
     }
 
-    const to = (recipients || []).filter((r: { email?: string }) => r && r.email)
-    if (to.length === 0) {
+    const emails = await resolveEmails(recipientUserIds || [])
+    if (emails.length === 0) {
       return new Response(JSON.stringify({ success: true, sent: 0 }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -74,13 +93,13 @@ serve(async (req) => {
       })
     }
 
-    const results = await Promise.allSettled(to.map(async (r: { email: string }) => {
+    const results = await Promise.allSettled(emails.map(async (email: string) => {
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: { 'api-key': BREVO_API_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sender: SENDER,
-          to: [{ email: r.email }],
+          to: [{ email }],
           subject,
           htmlContent: html,
         }),

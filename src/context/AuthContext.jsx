@@ -3,70 +3,56 @@ import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext(null)
 
+// Adopt a session handed off from Staff Hub via the URL fragment
+// (#at=<access_token>&rt=<refresh_token>). Runs once before we read the session.
+async function adoptHandoffSession() {
+  const hash = window.location.hash || ''
+  if (!hash.includes('at=')) return
+  const params = new URLSearchParams(hash.replace(/^#/, ''))
+  const access_token = params.get('at')
+  const refresh_token = params.get('rt')
+  // Scrub the tokens from the URL immediately, regardless of outcome.
+  history.replaceState(null, '', window.location.pathname + window.location.search)
+  if (access_token && refresh_token) {
+    try { await supabase.auth.setSession({ access_token, refresh_token }) } catch { /* ignore */ }
+  }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user)
-      else setLoading(false)
+    let unsub = () => {}
+
+    adoptHandoffSession().then(() => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setUser(session?.user ?? null)
+        if (session?.user) fetchProfile(session.user)
+        else setLoading(false)
+      })
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null)
+        if (session?.user) fetchProfile(session.user)
+        else { setProfile(null); setLoading(false) }
+      })
+      unsub = () => subscription.unsubscribe()
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user)
-      else { setProfile(null); setLoading(false) }
-    })
-
-    return () => subscription.unsubscribe()
+    return () => unsub()
   }, [])
 
+  // Read-only. Profiles are created by the Staff Hub (P66) signup trigger; we never insert here.
   async function fetchProfile(authUser) {
     const { data } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', authUser.id)
       .single()
-
-    if (data) {
-      setProfile(data)
-    } else {
-      // Profile missing — create from auth metadata
-      const meta = authUser.user_metadata || {}
-      if (meta.full_name) {
-        await supabase.from('profiles').insert({
-          id: authUser.id,
-          full_name: meta.full_name,
-          employee_id: meta.employee_id || '',
-          email: authUser.email,
-        })
-        const { data: newProfile } = await supabase
-          .from('profiles').select('*').eq('id', authUser.id).single()
-        setProfile(newProfile)
-      } else {
-        setProfile(null)
-      }
-    }
+    setProfile(data ?? null)
     setLoading(false)
-  }
-
-  async function signIn(email, password) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) throw error
-  }
-
-  async function signUp(email, password, fullName, employeeId) {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, employee_id: employeeId },
-      },
-    })
-    if (error) throw error
   }
 
   async function signOut() {
@@ -74,7 +60,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   )
