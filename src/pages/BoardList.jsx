@@ -194,6 +194,17 @@ export default function BoardList() {
             </div>
           </div>
         ))}
+
+        {/* Disclaimer */}
+        <div style={{
+          marginTop: '1.25rem', background: 'var(--card-bg)',
+          border: '0.5px solid var(--card-border)', borderRadius: 10,
+          padding: '12px 14px',
+        }}>
+          <p style={{ fontSize: 10, color: 'var(--subtext-color)', lineHeight: 1.6, margin: 0 }}>
+            <strong style={{ color: 'var(--subtext-color)' }}>⚠️ Disclaimer:</strong> This app is an unofficial tool made only to help drivers post and find duty swaps. It is not an official Australia Post or Brisbane Transport product. Any swap arranged here must still be submitted through the official Duty Swap form and approved by a supervisor. The developer and Australia Post are not responsible for any errors or issues from using this app. Users are responsible for arranging and confirming their own swaps.
+          </p>
+        </div>
       </div>
 
       {/* FAB */}
