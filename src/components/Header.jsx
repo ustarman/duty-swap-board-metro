@@ -85,7 +85,7 @@ export default function Header() {
         <h1 style={{ fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.2 }}>
           Swap Board
         </h1>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>Brisbane Transport</p>
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)', marginLeft: 1.5 }}>Transport Staff</p>
       </div>
 
       {/* Bell icon */}
