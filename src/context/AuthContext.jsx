@@ -40,6 +40,8 @@ export function AuthProvider({ children }) {
         await supabase.from('profiles').insert({
           id: authUser.id,
           full_name: meta.full_name,
+          first_name: meta.first_name || null,
+          last_name: meta.last_name || null,
           employee_id: meta.employee_id || '',
           email: authUser.email,
         })
@@ -58,12 +60,18 @@ export function AuthProvider({ children }) {
     if (error) throw error
   }
 
-  async function signUp(email, password, fullName, employeeId) {
+  async function signUp(email, password, firstName, lastName, employeeId) {
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, employee_id: employeeId },
+        data: {
+          full_name: fullName,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          employee_id: employeeId,
+        },
       },
     })
     if (error) throw error

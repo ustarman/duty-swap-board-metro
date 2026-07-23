@@ -10,7 +10,8 @@ export default function Login() {
   const navigate = useNavigate()
   const [mode, setMode] = useState('login') // 'login' | 'signup'
   const [form, setForm] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     employeeId: '',
     email: '',
     password: '',
@@ -26,7 +27,8 @@ export default function Login() {
     if (!form.email.trim()) { setError('Email is required'); return }
     if (!form.password) { setError('Password is required'); return }
     if (mode === 'signup') {
-      if (!form.fullName.trim()) { setError('Full name is required'); return }
+      if (!form.firstName.trim()) { setError('First name is required'); return }
+      if (!form.lastName.trim()) { setError('Last name is required'); return }
       if (!form.employeeId.trim()) { setError('Employee ID is required'); return }
     }
 
@@ -36,10 +38,10 @@ export default function Login() {
         await signIn(form.email, form.password)
         navigate('/')
       } else {
-        await signUp(form.email, form.password, form.fullName, form.employeeId)
+        await signUp(form.email, form.password, form.firstName, form.lastName, form.employeeId)
         setSuccess('Account created successfully! Please sign in.')
         setMode('login')
-        setForm(prev => ({ ...prev, fullName: '', employeeId: '', password: '' }))
+        setForm(prev => ({ ...prev, firstName: '', lastName: '', employeeId: '', password: '' }))
         setSubmitting(false)
       }
     } catch (err) {
@@ -105,14 +107,28 @@ export default function Login() {
           {mode === 'signup' && (
             <>
               <div style={{ marginBottom: '0.75rem' }}>
-                <span style={FIELD_LABEL}>Full Name</span>
+                <span style={FIELD_LABEL}>First Name</span>
                 <InputBox>
-                  <span style={INPUT_LABEL}>NAME</span>
+                  <span style={INPUT_LABEL}>FIRST NAME</span>
                   <input
                     type="text"
-                    value={form.fullName}
-                    onChange={set('fullName')}
-                    placeholder="e.g. Brendon Yun"
+                    value={form.firstName}
+                    onChange={set('firstName')}
+                    placeholder="e.g. Brendon"
+                    style={INPUT_STYLE}
+                  />
+                </InputBox>
+              </div>
+
+              <div style={{ marginBottom: '0.75rem' }}>
+                <span style={FIELD_LABEL}>Last Name</span>
+                <InputBox>
+                  <span style={INPUT_LABEL}>LAST NAME</span>
+                  <input
+                    type="text"
+                    value={form.lastName}
+                    onChange={set('lastName')}
+                    placeholder="e.g. Yun"
                     style={INPUT_STYLE}
                   />
                 </InputBox>
