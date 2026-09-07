@@ -7,7 +7,41 @@ import PostDetail from './pages/PostDetail'
 import Notifications from './pages/Notifications'
 import Login from './pages/Login'
 import { registerPushNotifications } from './hooks/usePushNotifications'
+import { AP_RED } from './theme'
 import './index.css'
+
+// Temporary stop: flip to false (and redeploy) to bring Swap Board back.
+// While true, the app renders only this notice — no routes, no auth, no
+// Supabase calls happen at all.
+const MAINTENANCE_MODE = true
+
+function MaintenanceNotice() {
+  return (
+    <div
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        minHeight: '100svh', textAlign: 'center', padding: '2rem',
+      }}
+    >
+      <div
+        style={{
+          width: 56, height: 56, borderRadius: 16, background: AP_RED,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 26, marginBottom: '1.25rem',
+        }}
+      >
+        🛠️
+      </div>
+      <p style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-color)', marginBottom: 8 }}>
+        Currently Under Maintenance
+      </p>
+      <p style={{ fontSize: 14, color: 'var(--subtext-color)', lineHeight: 1.6, maxWidth: 320 }}>
+        Swap Board is temporarily unavailable while we make some changes.
+        Please check back later.
+      </p>
+    </div>
+  )
+}
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -40,6 +74,14 @@ function AppRoutes() {
 }
 
 export default function App() {
+  if (MAINTENANCE_MODE) {
+    return (
+      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100svh', position: 'relative' }}>
+        <MaintenanceNotice />
+      </div>
+    )
+  }
+
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthProvider>
